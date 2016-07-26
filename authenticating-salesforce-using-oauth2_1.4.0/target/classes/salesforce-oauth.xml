@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml" xmlns:wmq="http://www.mulesoft.org/schema/mule/ee/wmq"  xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:context="http://www.springframework.org/schema/context" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:https="http://www.mulesoft.org/schema/mule/https" xmlns:sfdc="http://www.mulesoft.org/schema/mule/sfdc" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/sfdc http://www.mulesoft.org/schema/mule/sfdc/current/mule-sfdc.xsd
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
+http://www.mulesoft.org/schema/mule/ee/wmq http://www.mulesoft.org/schema/mule/ee/wmq/current/mule-wmq-ee.xsd">
+    <sfdc:config-with-oauth consumerKey="3MVG9ZL0ppGP5UrCp87kY3BuNXQb56Xjn_9RQmQ.wdeOlSRuoupNnNQEdkT.75QyGK3JngLFTCl_bGL8OidBz" consumerSecret="4652070064724976625" doc:name="Salesforce (OAuth)" name="Salesforce__OAuth_"   >
+        <sfdc:oauth-callback-config domain="localhost" localPort="9098" path="callback"/>
+    </sfdc:config-with-oauth>
+    <http:listener-config doc:name="HTTP Listener Configuration" host="localhost" name="HTTP_Listener_Configuration" port="9098"/>
+    <file:connector name="File" autoDelete="true" outputAppend="true" streaming="true" validateConnections="true" doc:name="File"/>
+    <file:connector name="File1" readFromDirectory="D:\Users\One\Desktop\abc" workFileNamePattern="sales.txt" autoDelete="true" streaming="true" validateConnections="true" doc:name="File"/>
+
+    
+    <flow name="salesforce-oauthFlow1">
+        <http:listener config-ref="HTTP_Listener_Configuration" doc:name="HTTP" path="/"/>
+
+        <sfdc:authorize accessTokenUrl="https://login.salesforce.com/services/oauth2/token" authorizationUrl="https://login.salesforce.com/services/oauth2/authorize" config-ref="Salesforce__OAuth_" display="PAGE" doc:name="Authorize at Salesforce"/>
+        <sfdc:query config-ref="Salesforce__OAuth_" doc:name="Perform a query at Salesforce" query="SELECT id,lastname,lastmodifieddate from contact limit 10"/>
+        <set-variable variableName="mystring" value="" doc:name="mystring"/>
+        <foreach doc:name="For Each">
+            <logger message="contact: #[payload]" level="INFO" doc:name="Logger"/>
+            <object-to-string-transformer doc:name="Object to String"/>
+            <expression-component doc:name="Expression"><![CDATA[flowVars.mystring += payload; ]]></expression-component>
+        </foreach>
+        <set-payload value="#[flowVars.mystring]" doc:name="Set Payload"/>
+    </flow>
+</mule>
