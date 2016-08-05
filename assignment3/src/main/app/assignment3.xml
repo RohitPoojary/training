@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ws="http://www.mulesoft.org/schema/mule/ws" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+    <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="9090" doc:name="HTTP Listener Configuration"/>
+    <ws:consumer-config name="Web_Service_Consumer" service="GlobalWeather" port="GlobalWeatherSoap12" serviceAddress="http://www.webservicex.net/globalweather.asmx" wsdlLocation="globalweather.wsdl.xml" doc:name="Web Service Consumer"/>
+    <flow name="assignment3Flow">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/weather" doc:name="HTTP"/>
+        <set-variable variableName="CityName" value="#[message.inboundProperties.'http.query.params'.CityName]" doc:name="CityName"/>
+        <set-variable variableName="CountryName" value="#[message.inboundProperties.'http.query.params'.CountryName]" doc:name="CountryName"/>
+        <set-payload value="&lt;GetWeather xmlns=&quot;http://www.webserviceX.NET&quot;&gt;&lt;CityName&gt;#[flowVars.CityName]&lt;/CityName&gt;&lt;CountryName&gt;#[flowVars.CountryName]&lt;/CountryName&gt;&lt;/GetWeather&gt;" doc:name="Set Payload"/>
+        <ws:consumer config-ref="Web_Service_Consumer" operation="GetWeather" doc:name="Web Service Consumer"/>
+    </flow>
+</mule>
