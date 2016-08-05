@@ -22,7 +22,7 @@ http://www.mulesoft.org/schema/mule/ee/wmq http://www.mulesoft.org/schema/mule/e
         <http:listener config-ref="HTTP_Listener_Configuration" doc:name="HTTP" path="/"/>
 
         <sfdc:authorize accessTokenUrl="https://login.salesforce.com/services/oauth2/token" authorizationUrl="https://login.salesforce.com/services/oauth2/authorize" config-ref="Salesforce__OAuth_" display="PAGE" doc:name="Authorize at Salesforce"/>
-        <sfdc:query config-ref="Salesforce__OAuth_" doc:name="Perform a query at Salesforce" query="SELECT id,lastname,lastmodifieddate from contact limit 10"/>
+        <sfdc:query config-ref="Salesforce__OAuth_" doc:name="Perform a query at Salesforce" query="SELECT Email,FirstName,LastModifiedDate,LastName FROM Contact"/>
         <set-variable variableName="mystring" value="" doc:name="mystring"/>
         <foreach doc:name="For Each">
             <logger message="contact: #[payload]" level="INFO" doc:name="Logger"/>
